@@ -72,3 +72,24 @@ def update_item(uri, database, collection, filter, change):
     finally:
         mongodb_client.close()
         logger.debug("Connection to mongo closed")
+
+def safe_save(uri, database, collection, data):
+    logging.debug("Count the items in mongo using data as filter")
+    result = search_item(
+        uri=uri,
+        database=database,
+        collection=collection,
+        data=data
+    )
+    if 1 <= len(result):
+        logging.debug("Receipt already processed skipping")
+        return result[0].get("_id")
+    elif 0 == len(result):
+        logging.debug("Saving receipt to mongo")
+        mongo_product_id = save_to_mongo(
+                uri=uri,
+                database=database,
+                collection=collection,
+                data=data
+        )
+        return mongo_product_id
