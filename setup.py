@@ -31,6 +31,5 @@ setup(
     # Dependent packages (distributions)
     install_requires=[
         "pymongo",
-        "logging"
     ]
 )
