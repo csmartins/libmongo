@@ -1,5 +1,6 @@
 import logging
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 #from pymongo import errors.ConnectionFailure
 
 logger = logging.getLogger(__name__)
@@ -38,7 +39,26 @@ def search_item(uri, database, collection, data):
     finally:
         mongodb_client.close()
         logger.debug("Connection to mongo closed")
-        
+
+def search_item_by_id(uri, database, collection, data):
+    mongodb_client = MongoClient(uri)
+    logger.debug("Connection to mongo initiated")
+    try:
+        mongo_database = mongodb_client[database]
+        mongo_collection = mongo_database[collection]
+
+        logger.debug("Find data in collection using id")
+        id = data["_id"]
+        data["_id"] = ObjectId(id)
+        product_result = mongo_collection.find(data)
+        return list(product_result)
+    except Exception as e:
+        logger.exception(e)
+        raise
+    finally:
+        mongodb_client.close()
+        logger.debug("Connection to mongo closed")
+
 def count_items(uri, database, collection, data):
     mongodb_client = MongoClient(uri)
     logger.debug("Connection to mongo initiated")
